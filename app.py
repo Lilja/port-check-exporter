@@ -5,7 +5,7 @@ from prometheus_client import start_http_server, Gauge
 from time import sleep
 
 
-CONF_PATH = os.environ.get('CONF_PATH', './config.toml')
+CONF_PATH = os.environ.get('CONF_PATH', '/config.toml')
 FREQUENCY = os.environ.get('FREQUENCY', 43200)
 PORT = os.environ.get('PORT', 8080)
 
