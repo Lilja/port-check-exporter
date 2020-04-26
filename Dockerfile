@@ -2,6 +2,8 @@ FROM python:3.7-alpine
 
 LABEL maintainer="Erik <erikvlilja+syex@gmail.com>"
 
+VOLUME /config.toml
+
 RUN mkdir /app
 
 COPY pyproject.toml /app/
