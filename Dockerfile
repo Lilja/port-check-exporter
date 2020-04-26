@@ -20,4 +20,6 @@ RUN pip --no-cache-dir install poetry poetry-setup \
 
 COPY . /app
 
+EXPOSE 8080
+
 CMD ["poetry", "run", "python", "/app/app.py"]

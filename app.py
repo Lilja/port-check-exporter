@@ -7,6 +7,7 @@ from time import sleep
 
 CONF_PATH = os.environ.get('CONF_PATH', './config.toml')
 FREQUENCY = os.environ.get('FREQUENCY', 43200)
+PORT = os.environ.get('PORT', 8080)
 
 
 def test_port(domain, port):
@@ -52,7 +53,7 @@ def prometheus_metrics():
 
 
 if __name__ == '__main__':
-    start_http_server(8000)
+    start_http_server(PORT)
 
     config = read_conf()
     metric = prometheus_metrics()
