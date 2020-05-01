@@ -90,7 +90,7 @@ def prometheus_metrics():
 
 
 if __name__ == '__main__':
-    print(f'Starting a server on {port}')
+    print(f'Starting a server on {PORT}')
     start_http_server(PORT)
 
     config = read_conf()
