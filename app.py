@@ -62,7 +62,7 @@ def check(error_metric, metric, config):
         port = obj['port']
 
         try:
-            if test_port(domain, port)
+            if test_port(domain, port):
                 metric.labels(job, domain, port).set(1)
             else:
                 metric.labels(job, domain, port).set(0)
