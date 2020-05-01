@@ -11,6 +11,9 @@ PORT = int(os.environ.get('PORT', 8080))
 SOCKET_REST_TOKEN = os.environ['TOKEN']
 DEBUG = os.environ.get('DEBUG', False)
 
+if DEBUG:
+    print('Loaded')
+
 
 class Service(object):
     def __init__(self, domain, port, token=None):
