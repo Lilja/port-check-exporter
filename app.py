@@ -30,7 +30,7 @@ class CodeBeautify(Service):
                 'domain': self.domain
             }
         )
-        return x.json()[0]
+        return x.json()[0] == 'Open'
 
 
 class SocketRest(Service):
@@ -43,7 +43,7 @@ class SocketRest(Service):
                 "token": self.token
             }
         )
-        return x.json()
+        return x.json() == 'Online'
 
 
 def test_port(domain, port):
@@ -62,9 +62,7 @@ def check(metric, config):
         port = obj['port']
 
         try:
-            res = test_port(domain, port)
-
-            if res['status'] == 'Open':
+            if test_port(domain, port)
                 metric.labels(job, domain, port).set(1)
             else:
                 metric.labels(job, domain, port).set(0)
