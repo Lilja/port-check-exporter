@@ -55,7 +55,7 @@ def read_conf():
         return toml.loads(o.read())
 
 
-def check(metric, config):
+def check(error_metric, metric, config):
 
     for job, obj in config['servers'].items():
         domain = obj['domain']
@@ -66,16 +66,21 @@ def check(metric, config):
                 metric.labels(job, domain, port).set(1)
             else:
                 metric.labels(job, domain, port).set(0)
+            error_metric.set(0)
         except Exception:
+            error_metric.set(1)
             metric.labels(job, domain, port).set(0)
 
         sleep(1)
 
 
 def prometheus_metrics():
-    return Gauge(
-        'port_check_services', 'Status of ports',
-        ['service_name', 'domain', 'port']
+    return (
+        Gauge('port_check_error_count', 'Error'),
+        Gauge(
+            'port_check_services', 'Status of ports',
+            ['service_name', 'domain', 'port']
+        )
     )
 
 
@@ -83,7 +88,9 @@ if __name__ == '__main__':
     start_http_server(PORT)
 
     config = read_conf()
-    metric = prometheus_metrics()
+    error_metric, metric = prometheus_metrics()
+    error_metric.set(0)
+
     while True:
-        check(metric, config)
+        check(error_metric, metric, config)
         sleep(FREQUENCY)
