@@ -15,7 +15,7 @@ if DEBUG:
     print('Loaded')
 
 
-class RuntimeError(exception):
+class RuetimeError(Exception):
     pass
 
 
