@@ -8,17 +8,46 @@ from time import sleep
 CONF_PATH = os.environ.get('CONF_PATH', '/config.toml')
 FREQUENCY = int(os.environ.get('FREQUENCY', 43200))
 PORT = int(os.environ.get('PORT', 8080))
+SOCKET_REST_TOKEN = os.environ['TOKEN']
+
+
+class Service(object):
+    def __init__(self, domain, port, token=None):
+        self.domain = domain
+        self.port = port
+        self.token = token
+
+    def request(self):
+        raise NotImplemented()
+
+
+class CodeBeautify(Service):
+    def request(self):
+        x = requests.post(
+            "https://codebeautify.org/iptools/openPortChecker",
+            data={
+                'port': self.port,
+                'domain': self.domain
+            }
+        )
+        return x.json()[0]
+
+
+class SocketRest(Service):
+    def request(self):
+        x = request.post(
+            "http://socket-rest.vader.dersand.net",
+            params = {
+                "port": self.port,
+                "domain": self.domain,
+                "token": self.token
+            }
+        )
+        return x.json()
 
 
 def test_port(domain, port):
-    x = requests.post(
-        "https://codebeautify.org/iptools/openPortChecker",
-        data={
-            'port': port,
-            'domain': domain
-        }
-    )
-    return x.json()[0]
+    return SocketRest(domain, port, SOCKET_REST_TOKEN).request()
 
 
 def read_conf():
