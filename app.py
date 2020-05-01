@@ -53,7 +53,7 @@ class SocketRest(Service):
         )
         if x.json().get('error'):
             raise RuntimeError("SocketRest: Token incorrect")
-        return x.json() == 'Online'
+        return x.json().get('status') == 'Online'
 
 
 def test_port(domain, port):
