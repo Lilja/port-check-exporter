@@ -9,6 +9,7 @@ CONF_PATH = os.environ.get('CONF_PATH', '/config.toml')
 FREQUENCY = int(os.environ.get('FREQUENCY', 43200))
 PORT = int(os.environ.get('PORT', 8080))
 SOCKET_REST_TOKEN = os.environ['TOKEN']
+DEBUG = os.environ.get('DEBUG', False)
 
 
 class Service(object):
@@ -67,8 +68,11 @@ def check(error_metric, metric, config):
             else:
                 metric.labels(job, domain, port).set(0)
             error_metric.set(0)
+            if DEBUG:
+                print('All fine and dandy')
         except Exception as e:
-            print(str(e))
+            if DEBUG:
+                print(str(e))
             error_metric.set(1)
             metric.labels(job, domain, port).set(0)
 
@@ -94,4 +98,6 @@ if __name__ == '__main__':
 
     while True:
         check(error_metric, metric, config)
+        if DEBUG:
+            print('Sleeping')
         sleep(FREQUENCY)
