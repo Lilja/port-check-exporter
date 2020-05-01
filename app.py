@@ -67,7 +67,8 @@ def check(error_metric, metric, config):
             else:
                 metric.labels(job, domain, port).set(0)
             error_metric.set(0)
-        except Exception:
+        except Exception as e:
+            print(str(e))
             error_metric.set(1)
             metric.labels(job, domain, port).set(0)
 
