@@ -1,4 +1,5 @@
 FROM python:3.7-alpine
+ARG commit=""
 
 LABEL maintainer="Erik <erikvlilja+syex@gmail.com>"
 

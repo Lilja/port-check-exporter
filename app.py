@@ -36,7 +36,7 @@ class CodeBeautify(Service):
 
 class SocketRest(Service):
     def request(self):
-        x = request.post(
+        x = requests.post(
             "http://socket-rest.vader.dersand.net",
             params = {
                 "port": self.port,
@@ -90,6 +90,7 @@ def prometheus_metrics():
 
 
 if __name__ == '__main__':
+    print(f'Starting a server on {port}')
     start_http_server(PORT)
 
     config = read_conf()
