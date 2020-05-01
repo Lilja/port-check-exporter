@@ -15,6 +15,10 @@ if DEBUG:
     print('Loaded')
 
 
+class RuntimeError(exception):
+    pass
+
+
 class Service(object):
     def __init__(self, domain, port, token=None):
         self.domain = domain
@@ -47,6 +51,8 @@ class SocketRest(Service):
                 "token": self.token
             }
         )
+        if x.json().get('error'):
+            raise RuntimeError("SocketRest: Token incorrect")
         return x.json() == 'Online'
 
 
@@ -73,6 +79,9 @@ def check(error_metric, metric, config):
             error_metric.set(0)
             if DEBUG:
                 print('All fine and dandy')
+        except RuntimeError as e:
+            print(str(e))
+            exit(1)
         except Exception as e:
             if DEBUG:
                 print(str(e))
