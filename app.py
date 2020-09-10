@@ -1,7 +1,8 @@
 import os
 import requests
 import toml
-from prometheus_client import start_http_server, Gauge
+from prometheus_client import start_http_server, Gauge, Info
+from datetime import datetime
 from time import sleep
 
 
@@ -77,8 +78,6 @@ def check(error_metric, metric, config):
             else:
                 metric.labels(job, domain, port).set(0)
             error_metric.set(0)
-            if DEBUG:
-                print('All fine and dandy')
         except RuntimeError as e:
             print(str(e))
             exit(1)
@@ -97,7 +96,8 @@ def prometheus_metrics():
         Gauge(
             'port_check_services', 'Status of ports',
             ['service_name', 'domain', 'port']
-        )
+        ),
+        Info("port_check_last_ran", 'Last ran')
     )
 
 
@@ -106,11 +106,12 @@ if __name__ == '__main__':
     start_http_server(PORT)
 
     config = read_conf()
-    error_metric, metric = prometheus_metrics()
+    error_metric, metric, last_ran = prometheus_metrics()
     error_metric.set(0)
 
     while True:
         check(error_metric, metric, config)
         if DEBUG:
             print('Sleeping')
+        last_ran.info({'time': datetime.now().isoformat()})
         sleep(FREQUENCY)
