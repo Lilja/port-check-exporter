@@ -7,14 +7,14 @@ from time import sleep
 from json.decoder import JSONDecodeError
 
 
-CONF_PATH = os.environ.get('CONF_PATH', '/config.toml')
-FREQUENCY = int(os.environ.get('FREQUENCY', 43200))
-PORT = int(os.environ.get('PORT', 8080))
-SOCKET_REST_TOKEN = os.environ['TOKEN']
-DEBUG = os.environ.get('DEBUG', False)
+CONF_PATH = os.environ.get("CONF_PATH", "/config.toml")
+FREQUENCY = int(os.environ.get("FREQUENCY", 43200))
+PORT = int(os.environ.get("PORT", 8080))
+SOCKET_REST_TOKEN = os.environ["TOKEN"]
+DEBUG = os.environ.get("DEBUG", False)
 
 if DEBUG:
-    print('Loaded')
+    print("Loaded")
 
 
 class RuetimeError(Exception):
@@ -28,39 +28,32 @@ class Service(object):
         self.token = token
 
     def request(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class CodeBeautify(Service):
     def request(self):
         x = requests.post(
             "https://codebeautify.org/iptools/openPortChecker",
-            data={
-                'port': self.port,
-                'domain': self.domain
-            }
+            data={"port": self.port, "domain": self.domain},
         )
-        return x.json()[0] == 'Open'
+        return x.json()[0] == "Open"
 
 
 class SocketRest(Service):
     def request(self):
         x = requests.post(
             "http://socket-rest.vader.dersand.net",
-            params = {
-                "port": self.port,
-                "domain": self.domain,
-                "token": self.token
-            }
+            params={"port": self.port, "domain": self.domain, "token": self.token},
         )
         heson = None
         try:
             heson = x.json()
         except JSONDecodeError:
-            raise Exception(f"{domain}: Response is not JSON")
-        if heson.get('error'):
+            raise Exception(f"{self.domain}: Response is not JSON")
+        if heson.get("error"):
             raise RuntimeError("SocketRest: Token incorrect")
-        return heson.get('status') == 'Online'
+        return heson.get("status") == "Online"
 
 
 def test_port(domain, port):
@@ -74,9 +67,9 @@ def read_conf():
 
 def check(error_metric, metric, config):
 
-    for job, obj in config['servers'].items():
-        domain = obj['domain']
-        port = obj['port']
+    for job, obj in config["servers"].items():
+        domain = obj["domain"]
+        port = obj["port"]
 
         try:
             if test_port(domain, port):
@@ -98,17 +91,16 @@ def check(error_metric, metric, config):
 
 def prometheus_metrics():
     return (
-        Gauge('port_check_error_count', 'Error'),
+        Gauge("port_check_error_count", "Error"),
         Gauge(
-            'port_check_services', 'Status of ports',
-            ['service_name', 'domain', 'port']
+            "port_check_services", "Status of ports", ["service_name", "domain", "port"]
         ),
-        Info("port_check_last_ran", 'Last ran')
+        Info("port_check_last_ran", "Last ran"),
     )
 
 
-if __name__ == '__main__':
-    print(f'Starting a server on {PORT}')
+if __name__ == "__main__":
+    print(f"Starting a server on {PORT}")
     start_http_server(PORT)
 
     config = read_conf()
@@ -118,6 +110,6 @@ if __name__ == '__main__':
     while True:
         check(error_metric, metric, config)
         if DEBUG:
-            print('Sleeping')
-        last_ran.info({'time': datetime.now().isoformat()})
+            print("Sleeping")
+        last_ran.info({"time": datetime.now().isoformat()})
         sleep(FREQUENCY)
