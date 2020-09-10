@@ -4,6 +4,7 @@ import toml
 from prometheus_client import start_http_server, Gauge, Info
 from datetime import datetime
 from time import sleep
+from json.decoder import JSONDecodeError
 
 
 CONF_PATH = os.environ.get('CONF_PATH', '/config.toml')
@@ -52,9 +53,14 @@ class SocketRest(Service):
                 "token": self.token
             }
         )
-        if x.json().get('error'):
+        heson = None
+        try:
+            heson = x.json()
+        except JSONDecodeError:
+            raise Exception(f"{domain}: Response is not JSON")
+        if heson.get('error'):
             raise RuntimeError("SocketRest: Token incorrect")
-        return x.json().get('status') == 'Online'
+        return heson.get('status') == 'Online'
 
 
 def test_port(domain, port):
