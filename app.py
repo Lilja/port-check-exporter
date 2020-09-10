@@ -35,7 +35,7 @@ class CodeBeautify(Service):
     def request(self):
         x = requests.post(
             "https://codebeautify.org/iptools/openPortChecker",
-            data={"port": self.port, "domain": self.domain},
+            data={"port": self.port, "domain": self.domain}
         )
         return x.json()[0] == "Open"
 
@@ -44,13 +44,13 @@ class SocketRest(Service):
     def request(self):
         x = requests.post(
             "http://socket-rest.vader.dersand.net",
-            params={"port": self.port, "domain": self.domain, "token": self.token},
+            params={"port": self.port, "domain": self.domain, "token": self.token}
         )
         heson = None
         try:
             heson = x.json()
         except JSONDecodeError:
-            raise Exception(f"{self.domain}: Response is not JSON")
+            raise Exception(f"{self.domain}: Response is not JSON. Content: '{x.text}'")
         if heson.get("error"):
             raise RuntimeError("SocketRest: Token incorrect")
         return heson.get("status") == "Online"
