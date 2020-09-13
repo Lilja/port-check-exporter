@@ -21,4 +21,4 @@ COPY . /app
 
 EXPOSE 8080
 
-CMD ["poetry", "run", "python", "/app/app.py"]
+CMD ["poetry", "run", "python", "-u", "/app/app.py"]
