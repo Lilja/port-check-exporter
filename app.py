@@ -21,6 +21,11 @@ PORT = int(os.environ.get("PORT", 8080))
 SOCKET_REST_TOKEN = os.environ["TOKEN"]
 DEBUG = os.environ.get("DEBUG", False)
 
+if DEBUG:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
+
 
 if "SENTRY_DSN" in os.environ:
     import sentry_sdk
