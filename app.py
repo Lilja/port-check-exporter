@@ -19,8 +19,15 @@ PORT = int(os.environ.get("PORT", 8080))
 SOCKET_REST_TOKEN = os.environ["TOKEN"]
 DEBUG = os.environ.get("DEBUG", False)
 
+
+if "SENTRY_DSN" in os.environ:
+    import sentry_sdk
+    sentry_sdk.init(os.environ["SENTRY_DSN"], traces_sample_rate=1.0)
+
+
 if DEBUG:
     logger.info("Loaded")
+
 
 
 class RuetimeError(Exception):
