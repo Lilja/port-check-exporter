@@ -1,7 +1,7 @@
 import os
 import requests
 import toml
-from prometheus_client import start_http_server, Gauge, Info
+from prometheus_client import start_http_server, Gauge
 from datetime import datetime
 from time import sleep
 from json.decoder import JSONDecodeError
@@ -22,12 +22,14 @@ DEBUG = os.environ.get("DEBUG", False)
 
 if "SENTRY_DSN" in os.environ:
     import sentry_sdk
+
     sentry_sdk.init(os.environ["SENTRY_DSN"], traces_sample_rate=1.0)
+    logger.info("Sentry loaded")
+    print("Sentry loaded")
 
 
 if DEBUG:
     logger.info("Loaded")
-
 
 
 class RuetimeError(Exception):
@@ -110,7 +112,7 @@ def prometheus_metrics():
         Gauge(
             "port_check_services", "Status of ports", ["service_name", "domain", "port"]
         ),
-        Info("port_check_last_ran", "Last ran"),
+        Gauge("port_check_last_ran", "Last ran", ["LastRan"]),
     )
 
 
@@ -126,5 +128,5 @@ if __name__ == "__main__":
         check(error_metric, metric, config)
         if DEBUG:
             print("Sleeping")
-        last_ran.info({"time": datetime.now().isoformat()})
+        last_ran.labels(datetime.now().isoformat()).set(1)
         sleep(FREQUENCY)
