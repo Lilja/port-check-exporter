@@ -5,6 +5,12 @@ from prometheus_client import start_http_server, Gauge, Info
 from datetime import datetime
 from time import sleep
 from json.decoder import JSONDecodeError
+import logging
+
+FORMAT = "%(asctime)-15s %(clientip)s %(user)-8s %(message)s"
+logging.basicConfig(format=FORMAT)
+
+logger = logging.getLogger(__name__)
 
 
 CONF_PATH = os.environ.get("CONF_PATH", "/config.toml")
@@ -14,7 +20,7 @@ SOCKET_REST_TOKEN = os.environ["TOKEN"]
 DEBUG = os.environ.get("DEBUG", False)
 
 if DEBUG:
-    print("Loaded")
+    logger.info("Loaded")
 
 
 class RuetimeError(Exception):
@@ -35,7 +41,7 @@ class CodeBeautify(Service):
     def request(self):
         x = requests.post(
             "https://codebeautify.org/iptools/openPortChecker",
-            data={"port": self.port, "domain": self.domain}
+            data={"port": self.port, "domain": self.domain},
         )
         return x.json()[0] == "Open"
 
@@ -44,13 +50,15 @@ class SocketRest(Service):
     def request(self):
         x = requests.post(
             "http://socket-rest.vader.dersand.net",
-            params={"port": self.port, "domain": self.domain, "token": self.token}
+            params={"port": self.port, "domain": self.domain, "token": self.token},
         )
         heson = None
         try:
             heson = x.json()
-        except JSONDecodeError:
-            raise Exception(f"{self.domain}: Response is not JSON. Content: '{x.text}'")
+        except JSONDecodeError as e:
+            raise Exception(
+                f"{self.domain}: Response is not JSON. Content: '{x.text}'. Error: {str(e)}"
+            )
         if heson.get("error"):
             raise RuntimeError("SocketRest: Token incorrect")
         return heson.get("status") == "Online"
@@ -78,11 +86,11 @@ def check(error_metric, metric, config):
                 metric.labels(job, domain, port).set(0)
             error_metric.set(0)
         except RuntimeError as e:
-            print(str(e))
+            logger.info(str(e))
             exit(1)
         except Exception as e:
             if DEBUG:
-                print(str(e))
+                logger.info(str(e))
             error_metric.set(1)
             metric.labels(job, domain, port).set(0)
 
@@ -100,7 +108,7 @@ def prometheus_metrics():
 
 
 if __name__ == "__main__":
-    print(f"Starting a server on {PORT}")
+    logger.info(f"Starting a server on {PORT}")
     start_http_server(PORT)
 
     config = read_conf()
