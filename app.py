@@ -131,5 +131,5 @@ if __name__ == "__main__":
         check(error_metric, metric, config)
         if DEBUG:
             print("Sleeping")
-        last_ran.info({"time": datetime.now().isoformat()})
+        last_ran.info({"time": datetime.utcnow().isoformat()})
         sleep(FREQUENCY)
