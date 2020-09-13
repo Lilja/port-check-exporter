@@ -1,7 +1,7 @@
 import os
 import requests
 import toml
-from prometheus_client import start_http_server, Gauge
+from prometheus_client import start_http_server, Gauge, Info
 from datetime import datetime
 from time import sleep
 from json.decoder import JSONDecodeError
@@ -95,7 +95,7 @@ def check(error_metric, metric, config):
                 metric.labels(job, domain, port).set(0)
             error_metric.set(0)
         except RuntimeError as e:
-            logger.info(str(e))
+            logger.error(str(e))
             exit(1)
         except Exception as e:
             if DEBUG:
@@ -112,7 +112,7 @@ def prometheus_metrics():
         Gauge(
             "port_check_services", "Status of ports", ["service_name", "domain", "port"]
         ),
-        Gauge("port_check_last_ran", "Last ran", ["LastRan"]),
+        Info("port_check_last_ran", "Last ran"),
     )
 
 
@@ -128,5 +128,5 @@ if __name__ == "__main__":
         check(error_metric, metric, config)
         if DEBUG:
             print("Sleeping")
-        last_ran.labels(datetime.now().isoformat()).set(1)
+        last_ran.info({"time": datetime.now().isoformat()})
         sleep(FREQUENCY)
