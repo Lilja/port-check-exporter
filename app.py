@@ -7,6 +7,8 @@ from time import sleep
 from json.decoder import JSONDecodeError
 import logging
 
+print("Setting up exporter")
+
 FORMAT = "%(asctime)-15s %(clientip)s %(user)-8s %(message)s"
 logging.basicConfig(format=FORMAT)
 
@@ -118,6 +120,7 @@ def prometheus_metrics():
 
 if __name__ == "__main__":
     logger.info(f"Starting a server on {PORT}")
+    print(f"Starting a server on {PORT}")
     start_http_server(PORT)
 
     config = read_conf()
