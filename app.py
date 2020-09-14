@@ -72,8 +72,10 @@ class SocketRest(Service):
         try:
             heson = x.json()
         except JSONDecodeError as e:
+            headers = str(x.headers)
             raise Exception(
-                f"{self.domain}: Response is not JSON. Content: '{x.text}'. Error: {str(e)}"
+                f"{self.domain}: Response is not JSON. Content: '{x.text}'. Error: "
+                f"{str(e)}. Response headers: {headers}, url: {x.url}"
             )
         if heson.get("error"):
             raise RuntimeError("SocketRest: Token incorrect")
